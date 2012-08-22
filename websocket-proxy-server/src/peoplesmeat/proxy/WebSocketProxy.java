@@ -43,7 +43,7 @@ import java.util.logging.LogManager;
 
 @WebSocketHandlerService
 public class WebSocketProxy extends WebSocketHandler {
-	static final Logger logger = LoggerFactory.getLogger(WebSocketChat.class);
+	static final Logger logger = LoggerFactory.getLogger(WebSocketProxy.class);
 	
 	static class ProxyConnection {
 		WebSocket webSocket;
@@ -75,11 +75,6 @@ public class WebSocketProxy extends WebSocketHandler {
 						byte[] bytes = new byte[buffer.limit()];
 						buffer.get(bytes);
 						
-						//Buffer send_buffer = ctx.getMemoryManager()
-						//		.allocate(buffer.limit()).put(bytes);
-						//send_buffer.position(0);
-						//connection.write(send_buffer);
-						// socket.sendMessage(bytes);
 						try {
 							String encoded = Hex.encodeHexString(bytes);
 							while (encoded.length() > 4000) {
@@ -88,7 +83,7 @@ public class WebSocketProxy extends WebSocketHandler {
 								encoded = encoded.substring(4000); 
 							}
 							webSocket.write(encoded); 
-							//webSocket.write(bytes);
+
 						} catch (IOException e) {
 							logger.error("Error Writing",e); 
 						} 
@@ -109,8 +104,7 @@ public class WebSocketProxy extends WebSocketHandler {
     	byte[] data= null;
 		try {
 			data = Hex.decodeHex(message.toCharArray());
-		} catch (DecoderException e1) {
-			// TODO Auto-generated catch block
+		} catch (DecoderException e1) {			
 			e1.printStackTrace();
 		} 
     	Buffer send_buffer = proxyConnection.memoryManager
@@ -122,34 +116,5 @@ public class WebSocketProxy extends WebSocketHandler {
 		} catch (Exception e) { 
 			logger.error("error sending", e.getMessage()); 
 		}
-    }
-   
-   /* @Override 
-    public void onByteMessage(WebSocket webSocket, byte[] data, int offset, int length) { 
-    	Buffer send_buffer = proxyConnection.memoryManager
-				.allocate(length).put(data, offset, length);
-    	
-		send_buffer.position(0);
-		try {
-			proxyConnection.connection.write(send_buffer).get();
-		} catch (Exception e) { 
-			logger.error("error sending", e.getMessage()); 
-		}
-    }*/
-
-    private final static class Data {
-
-        private final String text;
-        private final String author;
-
-        public Data(String author, String text) {
-            this.author = author;
-            this.text = text;
-        }
-
-        public String toString() {
-            return "{ \"text\" : \"" + text + "\", \"author\" : \"" + author
-                    + "\" , \"time\" : " + new Date().getTime() + "}";
-        }
     }
 }
