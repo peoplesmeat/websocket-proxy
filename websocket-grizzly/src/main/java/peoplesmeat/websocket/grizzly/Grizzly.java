@@ -43,31 +43,8 @@ import com.ning.http.client.websocket.WebSocketUpgradeHandler;
 
 public class Grizzly {
 	static Logger logger = LoggerFactory.getLogger(Grizzly.class);
-	//static String websocketUrl = "ws://localhost:8080/websocket-proxy-server/proxy/proxy";
-	static String websocketUrl = "wss://java.maraudertech.com/websocket-proxy-server/proxy/proxy";
 	static String proxyServer = null; 
 	static int proxyPort = 3128; 
-	static SSLContext buildSSLContext() throws NoSuchAlgorithmException,
-			KeyManagementException {
-
-		X509TrustManager t1 = new X509TrustManager() {
-			public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-				return null;
-			}
-
-			public void checkClientTrusted(
-					java.security.cert.X509Certificate[] certs, String authType) {
-			}
-
-			public void checkServerTrusted(
-					java.security.cert.X509Certificate[] certs, String authType) {
-			}
-		};
-		TrustManager[] trustAllCerts = new TrustManager[] { t1 };
-		SSLContext sc = SSLContext.getInstance("SSL");
-		sc.init(null, trustAllCerts, new java.security.SecureRandom());
-		return sc;
-	}
 
 	static void doTcp() throws IOException {
 		// Create TCP transport
@@ -80,9 +57,7 @@ public class Grizzly {
 		// Add TransportFilter, which is responsible
 		// for reading and writing data to the connection
 		filterChainBuilder.add(new TransportFilter());
-		// filterChainBuilder
-		// .add(new StringFilter(Charset.forName("UTF-8"), "\n"));
-		filterChainBuilder.add(new MyFilter());
+		filterChainBuilder.add(new RelayFilter());
 
 		transport.setProcessor(filterChainBuilder.build());
 
@@ -105,7 +80,7 @@ public class Grizzly {
 
 	}
 
-	static class MyFilter extends BaseFilter {
+	static class RelayFilter extends BaseFilter {
 		TCPNIOTransport transport2;
 		Connection connection2;
 		WebSocket websocket; 
@@ -129,37 +104,6 @@ public class Grizzly {
 									
 			return ctx.getStopAction();
 		}
-
-		/*@Override
-		public NextAction handleAccept(FilterChainContext ctx) {
-			final Connection connection = ctx.getConnection();
-			logger.info("Accepting");
-			transport2 = TCPNIOTransportBuilder.newInstance().build();
-			transport2.setProcessor(FilterChainBuilder.stateless()
-					.add(new TransportFilter()).add(new BaseFilter() {
-						public NextAction handleRead(FilterChainContext ctx) {
-							System.out.println(ctx.getMessage());
-							Buffer buffer = (Buffer) ctx.getMessage();
-							byte[] bytes = new byte[buffer.limit()];
-							buffer.get(bytes);
-							Buffer send_buffer = ctx.getMemoryManager()
-									.allocate(buffer.limit()).put(bytes);
-							send_buffer.position(0);
-							connection.write(send_buffer);
-							// socket.sendMessage(bytes);
-							return ctx.getStopAction();
-						}
-					}).build());
-			try {
-				transport2.start();
-				connection2 = transport2.connect("192.168.145.133", 22).get();
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-			return ctx.getInvokeAction();
-		}*/
 		
 		private void connectViaWebSocket(final Connection connection, final MemoryManager memoryManager) throws InterruptedException, ExecutionException, IOException {
 			
@@ -167,15 +111,12 @@ public class Grizzly {
 			if (proxyServer != null) { 
 				configBuilder.setProxyServer(new ProxyServer(Protocol.HTTP, proxyServer, proxyPort)); 
 			}
-			 //.setSSLContext(buildSSLContext())
-			 //.setProxyServer(
-			 //new ProxyServer(Protocol.HTTP, "192.168.1.124", 3128))
-			//		.build();
+			
 			AsyncHttpClientConfig config = configBuilder.build(); 
 
 			AsyncHttpClient c = new AsyncHttpClient(new GrizzlyAsyncHttpProvider(
 					config), config);
-			// String wsUrl = "wss://192.168.1.124/atmosphere-chat/chat";
+
 			String wsUrl = websocketUrl;
 			WebSocketListener listener = new DefaultWebSocketListener() {
 				@Override
@@ -200,18 +141,6 @@ public class Grizzly {
 						logger.error("error writing to local connection", e); 
 					} 
 				}
-				/*@Override
-				public void onMessage(byte [] message) { 
-					logger.info("Message arrived " + message.length + " bytes");
-					logger.info("APACHE->WEBSOCKET:" + Hex.encodeHexString(message)); 
-					Buffer buffer = memoryManager.allocate(message.length).put(message);
-					buffer.position(0); 
-					try {
-						connection.write(buffer).get();
-					} catch (Exception e) { 
-						logger.error("error writing to local connection", e); 
-					} 
-				}*/
 			};
 
 			WebSocketUpgradeHandler handler = new WebSocketUpgradeHandler.Builder()
@@ -241,7 +170,7 @@ public class Grizzly {
 			IOException, NoSuchAlgorithmException, KeyManagementException {
 
 		doTcp(); 
-		//socket.sendTextMessage("Here"); 
+		System.out.println("Press Enter To Quit"); 
 		System.in.read(); 
 	}
 

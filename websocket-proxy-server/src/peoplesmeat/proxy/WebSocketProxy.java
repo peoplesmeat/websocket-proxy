@@ -18,9 +18,6 @@ package peoplesmeat.proxy;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.atmosphere.config.service.WebSocketHandlerService;
-import org.atmosphere.cpr.AtmosphereResource;
-import org.atmosphere.cpr.Broadcaster;
-import org.atmosphere.cpr.BroadcasterFactory;
 import org.atmosphere.websocket.WebSocket;
 import org.atmosphere.websocket.WebSocketHandler;
 import org.glassfish.grizzly.Buffer;
@@ -37,9 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.LogManager;
 
 @WebSocketHandlerService
 public class WebSocketProxy extends WebSocketHandler {
