@@ -43,6 +43,7 @@ import com.ning.http.client.websocket.WebSocketUpgradeHandler;
 
 public class Grizzly {
 	static Logger logger = LoggerFactory.getLogger(Grizzly.class);
+	static String websocketUrl;
 	static String proxyServer = null; 
 	static int proxyPort = 3128; 
 
