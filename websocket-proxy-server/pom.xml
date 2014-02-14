@@ -5,11 +5,21 @@
     <artifactId>websocket-proxy-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>war</packaging>
+
+    <build>
+        <finalName>websocket</finalName>
+    </build>
+
+    <properties>
+        <logback.version>1.0.1</logback.version>
+        <atmosphere.version>2.0.7</atmosphere.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.atmosphere</groupId>
             <artifactId>atmosphere-runtime</artifactId>
-            <version>1.0.0.beta5</version>
+            <version>${atmosphere.version}</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.grizzly</groupId>
@@ -21,5 +31,18 @@
             <artifactId>commons-codec</artifactId>
             <version>1.6</version>
         </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
     </dependencies>
+
+
 </project>

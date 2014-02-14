@@ -20,6 +20,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.atmosphere.config.service.WebSocketHandlerService;
 import org.atmosphere.websocket.WebSocket;
 import org.atmosphere.websocket.WebSocketHandler;
+import org.atmosphere.websocket.WebSocketProcessor;
 import org.glassfish.grizzly.Buffer;
 import org.glassfish.grizzly.Connection;
 import org.glassfish.grizzly.filterchain.BaseFilter;
@@ -36,7 +37,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 @WebSocketHandlerService
-public class WebSocketProxy extends WebSocketHandler {
+public class WebSocketProxy implements WebSocketHandler {
 	static final Logger logger = LoggerFactory.getLogger(WebSocketProxy.class);
 	
 	static class ProxyConnection {
@@ -92,6 +93,22 @@ public class WebSocketProxy extends WebSocketHandler {
 			e.printStackTrace();
 		}
 	}
+
+    @Override
+    public void onClose(WebSocket webSocket) {
+        logger.info("Closed");
+
+    }
+
+    @Override
+    public void onError(WebSocket webSocket, WebSocketProcessor.WebSocketException e) {
+        logger.error("ERROR", e);
+    }
+
+    @Override
+    public void onByteMessage(WebSocket webSocket, byte[] bytes, int i, int i2) throws IOException {
+        logger.debug("onByteMessage");
+    }
 
     public void onTextMessage(WebSocket webSocket, String message) {
 

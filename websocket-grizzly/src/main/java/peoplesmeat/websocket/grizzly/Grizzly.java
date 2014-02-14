@@ -10,6 +10,10 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.Options;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.glassfish.grizzly.Buffer;
@@ -44,7 +48,7 @@ import com.ning.http.client.websocket.WebSocketUpgradeHandler;
 public class Grizzly {
 	static Logger logger = LoggerFactory.getLogger(Grizzly.class);
 	static String websocketUrl;
-	static String proxyServer = null; 
+	static String proxyServer = "localhost";
 	static int proxyPort = 3128; 
 
 	static void doTcp() throws IOException {
@@ -154,8 +158,8 @@ public class Grizzly {
 		@Override 
 		public NextAction handleAccept(FilterChainContext ctx) {
 			try {				
-				logger.info("Connection on " + ctx.getConnection()); 
-				connectViaWebSocket(ctx.getConnection(), ctx.getMemoryManager());
+				logger.info("Connection on " + ctx.getConnection());
+                connectViaWebSocket(ctx.getConnection(), ctx.getMemoryManager());
 			} catch (Exception e) { 
 				ctx.getConnection().close(); 
 				logger.error("error connecting, closing connection", e); 
@@ -176,10 +180,19 @@ public class Grizzly {
 	}
 
 	public static void main(String[] args) throws Exception {
-		if (args.length > 0) { 
-			proxyServer = args[0]; 
-			proxyPort = Integer.parseInt(args[1]); 
-		}
+        Options options = new Options();
+
+        options.addOption("proxy", true, "proxy");
+        options.addOption("host", true, "host");
+
+        CommandLineParser commandLineParser = new GnuParser();
+        CommandLine commandLine = commandLineParser.parse(options, args);
+
+        proxyServer = commandLine.getOptionValue("proxy").split(":")[0];
+        proxyPort = Integer.parseInt(commandLine.getOptionValue("proxy").split(":")[1]);
+
+        websocketUrl = commandLine.getOptionValue("host");
+
 		new Grizzly().go();
 	}
 }
