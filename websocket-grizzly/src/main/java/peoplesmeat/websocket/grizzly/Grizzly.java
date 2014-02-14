@@ -114,7 +114,7 @@ public class Grizzly {
 			
 			Builder configBuilder = new AsyncHttpClientConfig.Builder();
 			if (proxyServer != null) { 
-				configBuilder.setProxyServer(new ProxyServer(Protocol.HTTPS, proxyServer, proxyPort));
+				configBuilder.setProxyServer(new ProxyServer(proxyServer, proxyPort));
 			}
 			
 			AsyncHttpClientConfig config = configBuilder.build(); 
