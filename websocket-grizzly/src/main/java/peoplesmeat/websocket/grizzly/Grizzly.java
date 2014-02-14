@@ -102,10 +102,10 @@ public class Grizzly {
 			String encoded = Hex.encodeHexString(bytes);
 			while (encoded.length() > 4000) {
 				String toSend = encoded.substring(0,4000); 
-				websocket.sendTextMessage(toSend); 
+				websocket.sendTextMessage(toSend);
 				encoded = encoded.substring(4000); 
 			}
-			websocket.sendTextMessage(encoded); 
+			websocket.sendTextMessage(encoded);
 									
 			return ctx.getStopAction();
 		}
@@ -114,7 +114,7 @@ public class Grizzly {
 			
 			Builder configBuilder = new AsyncHttpClientConfig.Builder();
 			if (proxyServer != null) { 
-				configBuilder.setProxyServer(new ProxyServer(Protocol.HTTP, proxyServer, proxyPort)); 
+				configBuilder.setProxyServer(new ProxyServer(Protocol.HTTPS, proxyServer, proxyPort));
 			}
 			
 			AsyncHttpClientConfig config = configBuilder.build(); 
@@ -122,12 +122,17 @@ public class Grizzly {
 			AsyncHttpClient c = new AsyncHttpClient(new GrizzlyAsyncHttpProvider(
 					config), config);
 
-			String wsUrl = websocketUrl;
+            String wsUrl = websocketUrl;
 			WebSocketListener listener = new DefaultWebSocketListener() {
 				@Override
 				public void onClose(WebSocket ws) {
 					System.out.println(ws);
 				}
+
+                @Override
+                public void onOpen(WebSocket ws) {
+                    System.out.println(ws);
+                }
 
 				@Override
 				public void onMessage(String txtmessage) {
