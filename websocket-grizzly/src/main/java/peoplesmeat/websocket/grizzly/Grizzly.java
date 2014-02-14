@@ -48,7 +48,7 @@ import com.ning.http.client.websocket.WebSocketUpgradeHandler;
 public class Grizzly {
 	static Logger logger = LoggerFactory.getLogger(Grizzly.class);
 	static String websocketUrl;
-	static String proxyServer = "localhost";
+	static String proxyServer = null;
 	static int proxyPort = 3128; 
 
 	static void doTcp() throws IOException {
@@ -188,8 +188,10 @@ public class Grizzly {
         CommandLineParser commandLineParser = new GnuParser();
         CommandLine commandLine = commandLineParser.parse(options, args);
 
-        proxyServer = commandLine.getOptionValue("proxy").split(":")[0];
-        proxyPort = Integer.parseInt(commandLine.getOptionValue("proxy").split(":")[1]);
+        if (commandLine.hasOption("proxy")) {
+            proxyServer = commandLine.getOptionValue("proxy").split(":")[0];
+            proxyPort = Integer.parseInt(commandLine.getOptionValue("proxy").split(":")[1]);
+        }
 
         websocketUrl = commandLine.getOptionValue("host");
 
