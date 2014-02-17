@@ -69,24 +69,24 @@ public class WebSocketProxy implements WebSocketHandler {
                         Buffer buffer = (Buffer) ctx.getMessage();
                         byte[] bytes = new byte[buffer.limit()];
                         buffer.get(bytes);
-						
-						/*try {
-							String encoded = Hex.encodeHexString(bytes);
-							while (encoded.length() > 4000) {
-								String toSend = encoded.substring(0,4000); 
-								webSocket.write(toSend); 
-								encoded = encoded.substring(4000); 
-							}
-							webSocket.write(encoded); 
 
-						} catch (IOException e) {
-							logger.error("Error Writing",e); 
-						} */
                         try {
+                            String encoded = Hex.encodeHexString(bytes);
+                            while (encoded.length() > 4000) {
+                                String toSend = encoded.substring(0, 4000);
+                                webSocket.write(toSend);
+                                encoded = encoded.substring(4000);
+                           }
+                            webSocket.write(encoded);
+
+                        } catch (IOException e) {
+                            logger.error("Error Writing", e);
+                        } 
+                        /*try {
                             webSocket.write(bytes, 0, bytes.length);
                         } catch (IOException e) {
                             logger.error(e.getMessage(), e);
-                        }
+                        } */
                         return ctx.getStopAction();
                     }
                 }).build());

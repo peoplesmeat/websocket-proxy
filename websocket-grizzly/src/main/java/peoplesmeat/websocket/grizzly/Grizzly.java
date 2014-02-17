@@ -83,15 +83,15 @@ public class Grizzly {
 			byte[] bytes = new byte[buffer.limit()];
 			buffer.get(bytes);			
 			
-			/*String encoded = Hex.encodeHexString(bytes);
+			String encoded = Hex.encodeHexString(bytes);
 			while (encoded.length() > 4000) {
 				String toSend = encoded.substring(0,4000); 
 				websocket.sendTextMessage(toSend);
 				encoded = encoded.substring(4000); 
 			}
 			websocket.sendTextMessage(encoded);
-			*/
-            websocket.sendMessage(bytes);
+
+            //websocket.sendMessage(bytes);
 									
 			return ctx.getStopAction();
 		}
