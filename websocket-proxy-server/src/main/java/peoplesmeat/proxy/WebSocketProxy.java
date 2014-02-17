@@ -65,12 +65,12 @@ public class WebSocketProxy implements WebSocketHandler {
  
 		transport2.setProcessor(FilterChainBuilder.stateless()
 				.add(new TransportFilter()).add(new BaseFilter() {
-					public NextAction handleRead(FilterChainContext ctx) {											
-						Buffer buffer = (Buffer) ctx.getMessage();
-						byte[] bytes = new byte[buffer.limit()];
-						buffer.get(bytes);
+                    public NextAction handleRead(FilterChainContext ctx) {
+                        Buffer buffer = (Buffer) ctx.getMessage();
+                        byte[] bytes = new byte[buffer.limit()];
+                        buffer.get(bytes);
 						
-						try {
+						/*try {
 							String encoded = Hex.encodeHexString(bytes);
 							while (encoded.length() > 4000) {
 								String toSend = encoded.substring(0,4000); 
@@ -81,10 +81,15 @@ public class WebSocketProxy implements WebSocketHandler {
 
 						} catch (IOException e) {
 							logger.error("Error Writing",e); 
-						} 
-						return ctx.getStopAction();
-					}
-				}).build());
+						} */
+                        try {
+                            webSocket.write(bytes, 0, bytes.length);
+                        } catch (IOException e) {
+                            logger.error(e.getMessage(), e);
+                        }
+                        return ctx.getStopAction();
+                    }
+                }).build());
 		try {
 			transport2.start();
 			Connection connection2 = transport2.connect("localhost", 22).get();
@@ -106,10 +111,20 @@ public class WebSocketProxy implements WebSocketHandler {
     }
 
     @Override
-    public void onByteMessage(WebSocket webSocket, byte[] bytes, int i, int i2) throws IOException {
-        logger.debug("onByteMessage");
+    public void onByteMessage(WebSocket webSocket, byte[] data, int offset, int length) throws IOException {
+
+        Buffer send_buffer = proxyConnection.memoryManager
+                .allocate(length).put(data, offset, length);
+        send_buffer.position(0);
+        try {
+            proxyConnection.connection.write(send_buffer).get();
+        } catch (Exception e) {
+            logger.error("error sending", e.getMessage());
+        }
+
     }
 
+    @Override
     public void onTextMessage(WebSocket webSocket, String message) {
 
     	byte[] data= null;

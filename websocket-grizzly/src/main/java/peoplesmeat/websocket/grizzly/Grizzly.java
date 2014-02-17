@@ -83,13 +83,15 @@ public class Grizzly {
 			byte[] bytes = new byte[buffer.limit()];
 			buffer.get(bytes);			
 			
-			String encoded = Hex.encodeHexString(bytes);
+			/*String encoded = Hex.encodeHexString(bytes);
 			while (encoded.length() > 4000) {
 				String toSend = encoded.substring(0,4000); 
 				websocket.sendTextMessage(toSend);
 				encoded = encoded.substring(4000); 
 			}
 			websocket.sendTextMessage(encoded);
+			*/
+            websocket.sendMessage(bytes);
 									
 			return ctx.getStopAction();
 		}
@@ -115,7 +117,18 @@ public class Grizzly {
 
                 @Override
                 public void onOpen(WebSocket ws) {
-                    System.out.println(ws);
+                    logger.info("OPEN {}", ws);
+                }
+
+                @Override
+                public void onMessage(byte [] message) {
+                    Buffer buffer = memoryManager.allocate(message.length).put(message);
+                    buffer.position(0);
+                    try {
+                        connection.write(buffer).get();
+                    } catch (Exception e) {
+                        logger.error("error writing to local connection", e);
+                    }
                 }
 
 				@Override
