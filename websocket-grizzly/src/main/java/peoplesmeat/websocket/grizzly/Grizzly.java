@@ -108,6 +108,8 @@ public class Grizzly {
 			AsyncHttpClient c = new AsyncHttpClient(new GrizzlyAsyncHttpProvider(
 					config), config);
 
+            //AsyncHttpClient c = new AsyncHttpClient(config);
+
             String wsUrl = websocketUrl;
 			WebSocketListener listener = new DefaultWebSocketListener() {
 				@Override

@@ -78,10 +78,10 @@ class ConnectProxyClient(Protocol):
 
     def connectionMade(self):
         self.factory.request.channel.connectedRemote = self
-        self.factory.request.setResponseCode(200, "CONNECT OK")
-        self.factory.request.setHeader('X-Connected-IP',
-            self.transport.realAddress[0])
-        self.factory.request.setHeader('Content-Length', '0')
+        self.factory.request.setResponseCode(200, "Connection established")
+        #self.factory.request.setHeader('X-Connected-IP',
+        #    self.transport.realAddress[0])
+        #self.factory.request.setHeader('Content-Length', '-1')
         self.factory.request.finish()
 
     def connectionLost(self, reason):
